@@ -1,0 +1,33 @@
+{% load static %}<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}Tracker{% endblock %}</title>
+<link rel="stylesheet" href="{% static 'tracker/css/style.css' %}">
+</head>
+<body>
+<header class="site-header">
+  <a href="{% url 'tracker:today' %}" class="brand">Tracker</a>
+  <nav class="tabs">
+    <a href="{% url 'tracker:today' %}">Today</a>
+    <a href="{% url 'tracker:routine' %}">Routine</a>
+    <a href="{% url 'tracker:history' %}">History</a>
+  </nav>
+  <form action="{% url 'logout' %}" method="post" class="inline-form">
+    {% csrf_token %}
+    <button type="submit">Log out</button>
+  </form>
+</header>
+<main class="container">
+  {% if messages %}
+  <ul class="messages">
+    {% for message in messages %}
+    <li class="message message-{{ message.tags }}">{{ message }}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+  {% block content %}{% endblock %}
+</main>
+</body>
+</html>

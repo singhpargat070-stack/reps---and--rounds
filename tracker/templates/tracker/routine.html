@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Routine{% endblock %}
+{% block content %}
+<h1>Your week</h1>
+
+<nav class="day-tabs">
+  {% for value, label in days %}
+  <a href="{% url 'tracker:routine_day' value %}" class="{% if value == day_key %}is-active{% endif %}">{{ label }}</a>
+  {% endfor %}
+</nav>
+
+<ul class="exercise-list">
+  {% for ex in exercises %}
+  <li>
+    <strong>{{ ex.name }}</strong> <span class="tag">{{ ex.type }}</span>
+    <a href="{% url 'tracker:routine_day' day_key %}?edit={{ ex.id }}">Edit</a>
+    <form action="{% url 'tracker:delete_routine_exercise' ex.id %}" method="post" class="inline-form">
+      {% csrf_token %}
+      <button type="submit">✕</button>
+    </form>
+  </li>
+  {% empty %}
+  <p>Nothing scheduled — rest day.</p>
+  {% endfor %}
+</ul>
+
+<details {% if editing %}open{% endif %}>
+  <summary>{% if editing %}Edit {{ editing.name }}{% else %}+ Add exercise{% endif %}</summary>
+  <form action="{% url 'tracker:routine_day' day_key %}" method="post">
+    {% csrf_token %}
+    <input type="text" name="name" value="{{ editing.name|default:'' }}" placeholder="Exercise name">
+    {% for value, label in exercise_types %}
+    <label><input type="radio" name="type" value="{{ value }}" {% if editing.type == value or not editing and value == "strength" %}checked{% endif %}> {{ label }}</label>
+    {% endfor %}
+    <label>Sets <input type="number" name="sets" value="{{ editing.sets|default_if_none:'' }}"></label>
+    <label>Reps <input type="number" name="reps" value="{{ editing.reps|default_if_none:'' }}"></label>
+    <label>Weight <input type="number" step="0.5" name="weight" value="{{ editing.weight|default_if_none:'' }}"></label>
+    <select name="weight_unit">
+      <option value="kg" {% if editing.weight_unit == "kg" or not editing %}selected{% endif %}>kg</option>
+      <option value="lb" {% if editing.weight_unit == "lb" %}selected{% endif %}>lb</option>
+    </select>
+    <label>Minutes <input type="number" name="duration_minutes" value="{{ editing.duration_minutes|default_if_none:'' }}"></label>
+    <label>Distance <input type="number" step="0.1" name="distance" value="{{ editing.distance|default_if_none:'' }}"></label>
+    <select name="distance_unit">
+      <option value="km" {% if editing.distance_unit == "km" or not editing %}selected{% endif %}>km</option>
+      <option value="mi" {% if editing.distance_unit == "mi" %}selected{% endif %}>mi</option>
+    </select>
+    <button type="submit">{% if editing %}Save changes{% else %}Add{% endif %}</button>
+  </form>
+</details>
+{% endblock %}

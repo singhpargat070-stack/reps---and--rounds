@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}History{% endblock %}
+{% block content %}
+<h1>History</h1>
+<p>{{ streak }} day streak · {{ total_workouts }} workouts logged</p>
+
+<div class="day-grid">
+  {% for day in grid_days %}
+  <span class="day-cell {% if day.done %}is-done{% endif %}" title="{{ day.date }}"></span>
+  {% endfor %}
+</div>
+
+<ul class="history-list">
+  {% for log in recent %}
+  <li><strong>{{ log.date|date:"D, j M" }}</strong> — {{ log.names|join:", " }}</li>
+  {% empty %}
+  <li>No workouts logged yet.</li>
+  {% endfor %}
+</ul>
+{% endblock %}
